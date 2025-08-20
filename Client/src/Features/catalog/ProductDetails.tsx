@@ -1,5 +1,3 @@
-import { use, useEffect, useState } from "react";
-import type { Product } from "../../app/Models/product";
 import { useParams } from "react-router-dom";
 import {
   Button,
@@ -13,23 +11,16 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useFetchProductDetailsQuery } from "./catalogApi";
 
 export default function ProductDetails() {
   const { id } = useParams();
-  const [product, setProduct] = useState<Product | null>(null);
 
-  useEffect(() => {
-    if (!id) return;
-    fetch(`https://localhost:5001/api/products/${id}`)
-      .then((response) => {
-        if (!response.ok) throw new Error("Network response was not ok");
-        return response.json();
-      })
-      .then((data) => setProduct(data))
-      .catch((error) => console.error("Error fetching product:", error));
-  }, [id]);
+  const { data: product, isLoading } = useFetchProductDetailsQuery(
+    id ? +id : 0
+  );
 
-  if (!product) return <div> Loading...</div>;
+  if (!product || isLoading) return <div> Loading...</div>;
 
   const productDetails = [
     { label: "Name", value: product.name },
