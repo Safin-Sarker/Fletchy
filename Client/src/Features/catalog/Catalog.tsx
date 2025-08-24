@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import type { Product } from "../../app/Models/product";
 import ProductList from "./ProductList";
 import { useFetchProductsQuery } from "./catalogApi";
 

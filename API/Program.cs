@@ -1,4 +1,5 @@
 using API.Data;
+using API.Middleware;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,11 +17,14 @@ builder.Services.AddDbContext<StoreContext>(options =>
 });
 
 builder.Services.AddCors();
+builder.Services.AddTransient<ExceptionMiddleware>();
 
 var app = builder.Build();
 
 
 app.MapControllers();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 DbInitializer.InitDb(app);
 
