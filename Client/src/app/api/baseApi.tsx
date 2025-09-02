@@ -9,6 +9,7 @@ import { routes } from "../routes/Routes";
 
 const customBasequery = fetchBaseQuery({
   baseUrl: "https://localhost:5001/api",
+  credentials: "include",
 });
 
 type ErrorResponse = string | { title: string } | { errors: string[] };
@@ -59,4 +60,5 @@ export const baseQueryWithErrorHandling = async (
         break;
     }
   }
+  return result;
 };
