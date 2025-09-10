@@ -1,15 +1,10 @@
-import {
-  Box,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  Paper,
-  Radio,
-  TextField,
-  Checkbox,
-} from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import { useFetchFiltersQuery } from "./catalogApi";
 import Search from "./Search";
+import { setBrands, setOrderBy, setTypes } from "./catalogSlice";
+import { useAppDispatch, useAppSelector } from "../../app/store/store";
+import RadionButtonGroup from "../../app/shared/components/RadionButtonGroup";
+import CheckBoxButton from "../../app/shared/components/CheckBoxButton";
 
 const sortOptions = [
   { value: "name", label: "Alphabetical" },
@@ -19,51 +14,37 @@ const sortOptions = [
 
 export default function Filters() {
   const { data } = useFetchFiltersQuery();
+  const { orderBy, types, brands } = useAppSelector((state) => state.catalog);
+  const dispatch = useAppDispatch();
+
+  if (!data?.brands || !data.types) return <Typography>Loading...</Typography>;
+
   return (
     <Box display="flex" flexDirection="column" gap={3}>
       <Paper>
         <Search />
       </Paper>
       <Paper sx={{ p: 3 }}>
-        <FormControl>
-          {sortOptions.map(({ value, label }) => (
-            <FormControlLabel
-              key={label}
-              control={<Radio sx={{ py: 0.7 }} />}
-              label={label}
-              value={value}
-            />
-          ))}
-        </FormControl>
+        <RadionButtonGroup
+          selectedValue={orderBy}
+          options={sortOptions}
+          onChange={(e) => dispatch(setOrderBy(e.target.value))}
+        />
       </Paper>
       <Paper sx={{ p: 3 }}>
-        <FormGroup>
-          {data &&
-            data.brands.map((item) => (
-              <FormControlLabel
-                key={item}
-                control={
-                  <Checkbox color="secondary" sx={{ py: 0.7, fontsize: 40 }} />
-                }
-                label={item}
-              />
-            ))}
-        </FormGroup>
+        <CheckBoxButton
+          items={data.brands}
+          checked={brands}
+          onChange={(items: string[]) => dispatch(setBrands(items))}
+        />
       </Paper>
 
       <Paper sx={{ p: 3 }}>
-        <FormGroup>
-          {data &&
-            data.types.map((item) => (
-              <FormControlLabel
-                key={item}
-                control={
-                  <Checkbox color="secondary" sx={{ py: 0.7, fontsize: 40 }} />
-                }
-                label={item}
-              />
-            ))}
-        </FormGroup>
+        <CheckBoxButton
+          items={data.types}
+          checked={types}
+          onChange={(items: string[]) => dispatch(setTypes(items))}
+        />
       </Paper>
     </Box>
   );

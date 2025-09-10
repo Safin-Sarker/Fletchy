@@ -44,10 +44,10 @@ export default function BasketItem({ item }: Props) {
           <Typography variant="h6">{item.name}</Typography>
           <Box display="flex" alignItems="center" gap={3}>
             <Typography sx={{ fontSize: "1.1rem" }}>
-              ${currencyFormat(item.price)} x {item.quantity}s
+              {currencyFormat(item.price)} x {item.quantity}s
             </Typography>
             <Typography sx={{ fontSize: "1.1rem" }} color="primary">
-              ${currencyFormat(item.price * item.quantity)}
+              {currencyFormat(item.price * item.quantity)}
             </Typography>
           </Box>
           <Grid2 container spacing={1} alignItems="center">
