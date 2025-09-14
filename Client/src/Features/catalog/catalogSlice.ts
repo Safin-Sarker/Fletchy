@@ -50,4 +50,5 @@ export const {
   setTypes,
   setBrands,
   setsearchTerm,
+  resetParams,
 } = catalogSlice.actions;
