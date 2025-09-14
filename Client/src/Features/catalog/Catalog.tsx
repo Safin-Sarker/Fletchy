@@ -23,7 +23,10 @@ export default function Catalog() {
             <ProductList products={data.items} />
             <AppPagiantion
               metadata={data.pagination}
-              onPageChange={(page: number) => dispatch(setPageNumber(page))}
+              onPageChange={(page: number) => {
+                dispatch(setPageNumber(page));
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
             />
           </>
         ) : (
