@@ -9,21 +9,23 @@ import ServerError from "../erros/ServerError";
 import NotFound from "../erros/NotFound";
 import BasketPage from "../../Features/basket/BasketPage";
 import CheckoutPage from "../../Features/checkout/CheckoutPage";
+import LoginForm from "../../Features/account/LoginForm";
 
 export const routes = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
-      { path: "/", element: <HomePage /> },
-      { path: "/catalog", element: <Catalog /> },
-      { path: "/catalog/:id", element: <ProductDetails /> },
-      { path: "/about", element: <AboutPage /> },
-      { path: "/contact", element: <ContactPage /> },
-      { path: "/basket", element: <BasketPage /> },
-      { path: "/checkout", element: <CheckoutPage /> },
-      { path: "/server-error", element: <ServerError /> },
-      { path: "/not-found", element: <NotFound /> },
+      { path: "", element: <HomePage /> },
+      { path: "catalog", element: <Catalog /> },
+      { path: "catalog/:id", element: <ProductDetails /> },
+      { path: "about", element: <AboutPage /> },
+      { path: "contact", element: <ContactPage /> },
+      { path: "basket", element: <BasketPage /> },
+      { path: "checkout", element: <CheckoutPage /> },
+      { path: "server-error", element: <ServerError /> },
+      { path: "login", element: <LoginForm /> },
+      { path: "not-found", element: <NotFound /> },
       { path: "*", element: <Navigate to="/not-found" replace /> },
     ],
   },
