@@ -14,6 +14,8 @@ import { Link, NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/store";
 import { setDarkMode } from "./uiSlice";
 import { useFetchBasketQuery } from "../../Features/basket/basketApi";
+import UserMenu from "./UserMenu";
+import { useUserInfoQuery } from "../../Features/account/accountApi";
 
 const midLinks = [
   { title: "Catalog", path: "/catalog" },
@@ -37,6 +39,7 @@ const navStyles = [
 ];
 
 export default function NavBar() {
+  const { data: user } = useUserInfoQuery();
   const { isLoading, darkMode } = useAppSelector((state) => state.ui);
   const dispatch = useAppDispatch();
   const { data: basket } = useFetchBasketQuery();
@@ -53,7 +56,7 @@ export default function NavBar() {
           alignItems: "center",
         }}
       >
-        <Box display={"flex"} alignItems="center">
+        <Box display="flex" alignItems="center">
           <Typography component={NavLink} to="/" variant="h6" sx={navStyles}>
             Fletchy
           </Typography>
@@ -81,14 +84,22 @@ export default function NavBar() {
               <ShoppingCart />
             </Badge>
           </IconButton>
-
-          <List sx={{ display: "flex" }}>
-            {rightLinks.map(({ title, path }) => (
-              <ListItem component={NavLink} to={path} key={path} sx={navStyles}>
-                {title.toUpperCase()}
-              </ListItem>
-            ))}
-          </List>
+          {user ? (
+            <UserMenu user={user} />
+          ) : (
+            <List sx={{ display: "flex" }}>
+              {rightLinks.map(({ title, path }) => (
+                <ListItem
+                  component={NavLink}
+                  to={path}
+                  key={path}
+                  sx={navStyles}
+                >
+                  {title.toUpperCase()}
+                </ListItem>
+              ))}
+            </List>
+          )}
         </Box>
       </Toolbar>
       {isLoading && (

@@ -2,10 +2,12 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithErrorHandling } from "../../app/api/baseApi";
 import type { User } from "../../app/Models/user";
 import type { LoginSchema } from "../../lib/schema/loginSchema";
+import { routes } from "../../app/routes/Routes";
 
 export const accountApi = createApi({
   reducerPath: "accountApi",
   baseQuery: baseQueryWithErrorHandling,
+  tagTypes: ["UserInfo"],
   endpoints: (builder) => ({
     login: builder.mutation<void, LoginSchema>({
       query: (creds) => {
@@ -14,6 +16,14 @@ export const accountApi = createApi({
           method: "POST",
           body: creds,
         };
+      },
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(accountApi.util.invalidateTags(["UserInfo"]));
+        } catch (error) {
+          console.log(error);
+        }
       },
     }),
     register: builder.mutation<void, object>({
@@ -27,15 +37,25 @@ export const accountApi = createApi({
     }),
     userInfo: builder.query<User, void>({
       query: () => "account/user-info",
+      providesTags: ["UserInfo"],
     }),
     logout: builder.mutation({
       query: () => ({
         url: "account/logout",
         method: "POST",
       }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        await queryFulfilled;
+        dispatch(accountApi.util.invalidateTags(["UserInfo"]));
+        routes.navigate("/");
+      },
     }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useLogoutMutation } =
-  accountApi;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useLogoutMutation,
+  useUserInfoQuery,
+} = accountApi;
