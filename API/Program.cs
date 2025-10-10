@@ -21,6 +21,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 
 builder.Services.AddCors();
 builder.Services.AddTransient<ExceptionMiddleware>();
+builder.Services.AddScoped<PaymentServices>();
 
 builder.Services
     .AddIdentity<User, IdentityRole>(opt =>
