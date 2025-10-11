@@ -8,13 +8,13 @@ This project is under active development and serves as both a technical portfoli
 ---
 
 ## 📑 Table of Contents
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Architecture](#-architecture)
-- [Screenshots](#-screenshots)
-- [Setup](#-setup)
-- [Roadmap](#-roadmap)
-- [Contact](#-contact)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Screenshots](#screenshots)
+- [Setup](#setup)
+- [Roadmap](#roadmap)
+- [Contact](#contact)
 
 ---
 
