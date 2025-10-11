@@ -44,9 +44,9 @@ This project is under active development and serves as both a technical portfoli
 - React  
 - TypeScript  
 - Vite  
-- Tailwind CSS + **Material UI** for modern, responsive design  
+- **Material UI** for modern, responsive design  
 - **Zod** for client-side form validation  
-- Axios for REST API communication  
+- **Redux Toolkit + RTK Query** for state management & data fetching  
 - React Router for navigation  
 
 **Backend:**  
@@ -63,7 +63,8 @@ This project is under active development and serves as both a technical portfoli
 
 **Development Tools:**  
 - Visual Studio 2022 / VS Code  
-- Git & GitHub for version control  
+- Git & GitHub for version control
+- GitHub Actions  
 - Docker Desktop for local containerized environments  
 ---
 
