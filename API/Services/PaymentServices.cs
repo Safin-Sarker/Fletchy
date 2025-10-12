@@ -7,7 +7,7 @@ namespace API.Services;
 
 public class PaymentServices(IConfiguration config)
 {
-  public async Task<PaymentIntent> createOrUpdatePaymentIntent(Basket basket)
+  public async Task<PaymentIntent> CreateOrUpdatePaymentIntent(Basket basket)
   {
     StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
 

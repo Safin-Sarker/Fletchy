@@ -483,3 +483,21 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 API/store.db
+
+
+
+# Local app settings (keep only the example file in Git)
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/appsettings.*.local.json
+
+# Environment files
+.env
+.env.*
+*.env
+
+# Generic secret patterns
+*.secrets.json
+*.secret.json
+secrets/*.json
+
