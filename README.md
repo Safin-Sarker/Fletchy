@@ -96,6 +96,11 @@ The backend communicates with the database using **Entity Framework Core**, and 
 
 
 ## Screenshots
+
+
+| 🛒 Cart | 🛍️ Product Catalog | 🔐 Login | 🧾 Registration |
+|:--------:|:------------------:|:--------:|:----------------:|
+| ![Cart](https://i.imgur.com/hMhv6OQ.png) | ![Product Catalog](https://i.imgur.com/eWWuYlk.png) | ![Login](https://i.imgur.com/THU9cEW.png) | ![Registration](https://i.imgur.com/WNRlRiF.png) |
 ---
 
 ## ⚙️ Setup
