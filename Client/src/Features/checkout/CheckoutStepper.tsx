@@ -8,8 +8,9 @@ import {
   StepLabel,
   Stepper,
 } from "@mui/material";
-import { AddressElement } from "@stripe/react-stripe-js";
+import { AddressElement, PaymentElement } from "@stripe/react-stripe-js";
 import React from "react";
+import Review from "./Review";
 
 const steps = ["Address", "Payment", "Review"];
 
@@ -43,10 +44,10 @@ export default function CheckoutStepper() {
           />
         </Box>
         <Box sx={{ display: activeStep === 1 ? "block" : "none" }}>
-          Payment step
+          <PaymentElement />
         </Box>
         <Box sx={{ display: activeStep === 2 ? "block" : "none" }}>
-          Review step
+          <Review />
         </Box>
       </Box>
 
