@@ -7,6 +7,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { useEffect, useMemo, useRef } from "react";
 import { useFetchBasketQuery } from "../basket/basketApi";
 import { useCreatePaymentIntentMutation } from "./checkoutApi";
+import { useAppSelector } from "../../app/store/store";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
@@ -14,6 +15,7 @@ export default function CheckoutPage() {
   const { data: basket } = useFetchBasketQuery();
   const [createPaymentIntent, { isLoading }] = useCreatePaymentIntentMutation();
   const created = useRef(false);
+  const { darkMode } = useAppSelector((state) => state.ui);
 
   useEffect(() => {
     if (!created.current) createPaymentIntent();
@@ -24,8 +26,12 @@ export default function CheckoutPage() {
     if (!basket?.clientSecret) return undefined;
     return {
       clientSecret: basket.clientSecret,
+      appearance: {
+        labels: "floating",
+        theme: darkMode ? "night" : "stripe",
+      },
     };
-  }, [basket?.clientSecret]);
+  }, [basket?.clientSecret, darkMode]);
 
   return (
     <Grid2 container spacing={2}>
