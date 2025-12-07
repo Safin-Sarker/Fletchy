@@ -9,7 +9,6 @@ import {
   Typography,
 } from "@mui/material";
 import { useFetchBasketQuery } from "../basket/basketApi";
-import { BorderBottom } from "@mui/icons-material";
 import { currencyFormat } from "../../lib/util";
 
 export default function Review() {
