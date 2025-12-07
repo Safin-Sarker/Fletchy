@@ -21,6 +21,12 @@ import {
   useUpdateUserAddressMutation,
 } from "../account/accountApi";
 import type { Address } from "../../app/Models/user";
+import type {
+  StripeAddressElementChangeEvent,
+  StripePaymentElementChangeEvent,
+} from "@stripe/stripe-js";
+import { useBasketinfo } from "../../lib/hooks/useBasket";
+import { currencyFormat } from "../../lib/util";
 
 const steps = ["Address", "Payment", "Review"];
 
@@ -31,6 +37,10 @@ export default function CheckoutStepper() {
   const [updateUserAddress] = useUpdateUserAddressMutation();
   const [saveAddressChecked, setSaveAddressChecked] = useState(false);
   const elements = useElements();
+  const [addressCompleted, setAddressCompleted] = useState(false);
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
+
+  const { total } = useBasketinfo();
 
   const handlenext = async () => {
     if (activeStep === 0 && saveAddressChecked && elements) {
@@ -59,6 +69,14 @@ export default function CheckoutStepper() {
     setActiveStep(activeStep - 1);
   };
 
+  const handleAddressChange = (event: StripeAddressElementChangeEvent) => {
+    setAddressCompleted(event.complete);
+  };
+
+  const handlePaymentChange = (event: StripePaymentElementChangeEvent) => {
+    setPaymentCompleted(event.complete);
+  };
+
   if (isLoading)
     return <Typography variant="h6">Loading checkout...</Typography>;
   return (
@@ -82,6 +100,7 @@ export default function CheckoutStepper() {
                 address: restAddress,
               },
             }}
+            onChange={handleAddressChange}
           />
           <FormControlLabel
             sx={{ display: "flex", justifyContent: "end" }}
@@ -95,7 +114,7 @@ export default function CheckoutStepper() {
           />
         </Box>
         <Box sx={{ display: activeStep === 1 ? "block" : "none" }}>
-          <PaymentElement />
+          <PaymentElement onChange={handlePaymentChange} />
         </Box>
         <Box sx={{ display: activeStep === 2 ? "block" : "none" }}>
           <Review />
@@ -104,7 +123,17 @@ export default function CheckoutStepper() {
 
       <Box display="flex" paddingTop={2} justifyContent="space -between">
         <Button onClick={handleback}>Back</Button>
-        <Button onClick={handlenext}>next</Button>
+        <Button
+          onClick={handlenext}
+          disabled={
+            (activeStep === 0 && !addressCompleted) ||
+            (activeStep === 1 && !paymentCompleted)
+          }
+        >
+          {activeStep === steps.length - 1
+            ? `Pay ${currencyFormat(total)}`
+            : "Next"}
+        </Button>
       </Box>
     </Paper>
   );
