@@ -1,0 +1,15 @@
+/* Hide Stripe branding/badge */
+.__PrivateStripeElement iframe[name^="__privateStripeFrame"] {
+  display: block !important;
+}
+
+/* Hide "Powered by Stripe" link */
+a[href*="stripe.com"][target="_blank"] {
+  display: none !important;
+}
+
+/* Hide Stripe badge in Elements */
+.p-Links,
+.__PrivateStripeElement-link {
+  display: none !important;
+}
