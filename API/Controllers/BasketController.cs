@@ -63,6 +63,23 @@ public class BasketController(StoreContext context) : BaseApiController
   }
 
 
+  [HttpDelete("clear")]
+  public async Task<IActionResult> ClearBasket()
+  {
+    var basket = await context.Baskets.GetBasketWithItems(Request.Cookies["basketId"]);
+
+    if (basket is null) return NoContent();
+
+    context.Baskets.Remove(basket);
+    Response.Cookies.Delete("basketId");
+
+    var result = await context.SaveChangesAsync() > 0;
+
+    if (result) return Ok();
+
+    return BadRequest("Problem clearing basket");
+  }
+
   private Basket? CreateBasket()
   {
 

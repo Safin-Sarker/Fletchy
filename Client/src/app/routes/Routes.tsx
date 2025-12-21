@@ -9,6 +9,7 @@ import ServerError from "../erros/ServerError";
 import NotFound from "../erros/NotFound";
 import BasketPage from "../../Features/basket/BasketPage";
 import CheckoutPage from "../../Features/checkout/CheckoutPage";
+import CheckoutSuccess from "../../Features/checkout/CheckoutSuccess";
 import LoginForm from "../../Features/account/LoginForm";
 import RegisterForm from "../../Features/account/RegisterForm";
 import RequireAuth from "./RequireAuth";
@@ -20,7 +21,10 @@ export const routes = createBrowserRouter([
     children: [
       {
         element: <RequireAuth />,
-        children: [{ path: "checkout", element: <CheckoutPage /> }],
+        children: [
+          { path: "checkout", element: <CheckoutPage /> },
+          { path: "checkout/success", element: <CheckoutSuccess /> },
+        ],
       },
       { path: "", element: <HomePage /> },
       { path: "catalog", element: <Catalog /> },

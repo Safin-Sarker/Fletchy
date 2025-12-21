@@ -30,11 +30,31 @@ public class PaymentServices(IConfiguration config)
     }
     else
     {
-      var options = new PaymentIntentUpdateOptions
+      // Get the existing PaymentIntent to check its status
+      intent = await service.GetAsync(basket.PaymentIntentId);
+
+      // Only update if payment hasn't succeeded yet
+      if (intent.Status == "requires_payment_method" ||
+          intent.Status == "requires_confirmation" ||
+          intent.Status == "requires_action")
       {
-        Amount = subtotal + deliveryFee
-      };
-      await service.UpdateAsync(basket.PaymentIntentId, options);
+        var options = new PaymentIntentUpdateOptions
+        {
+          Amount = subtotal + deliveryFee
+        };
+        intent = await service.UpdateAsync(basket.PaymentIntentId, options);
+      }
+      else if (intent.Status == "succeeded")
+      {
+        // If payment already succeeded, create a new PaymentIntent
+        var options = new PaymentIntentCreateOptions
+        {
+          Amount = subtotal + deliveryFee,
+          Currency = "usd",
+          PaymentMethodTypes = ["card"]
+        };
+        intent = await service.CreateAsync(options);
+      }
     }
 
     return intent;

@@ -24,8 +24,12 @@ public class PaymentsController(PaymentServices paymentService, StoreContext con
 
     if (intent == null) return BadRequest("Problem creating payment intent");
 
-    basket.PaymentIntentId ??= intent.Id;
-    basket.ClientSecret ??= intent.ClientSecret;
+    // Update basket with new PaymentIntent details (handles both new and replaced intents)
+    if (basket.PaymentIntentId != intent.Id || basket.ClientSecret != intent.ClientSecret)
+    {
+      basket.PaymentIntentId = intent.Id;
+      basket.ClientSecret = intent.ClientSecret;
+    }
 
     if(context.ChangeTracker.HasChanges())
     {

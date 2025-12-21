@@ -9,6 +9,7 @@ import {
   Stepper,
   Typography,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import {
   AddressElement,
   PaymentElement,
@@ -30,11 +31,13 @@ import type {
 import { useBasketinfo } from "../../lib/hooks/useBasket";
 import { currencyFormat } from "../../lib/util";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
 
 const steps = ["Address", "Payment", "Review"];
 
 export default function CheckoutStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
+  const { basket, total, clearBasket } = useBasketinfo();
   const { data: { name, ...restAddress } = {} as Address, isLoading } =
     useFetchAddressQuery();
   const [updateUserAddress] = useUpdateUserAddressMutation();
@@ -43,8 +46,8 @@ export default function CheckoutStepper() {
   const stripe = useStripe();
   const [addressCompleted, setAddressCompleted] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
-
-  const { total } = useBasketinfo();
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
   const [confirmationToken, setConfirmationToken] =
     useState<ConfirmationToken | null>(null);
 
@@ -64,6 +67,37 @@ export default function CheckoutStepper() {
     }
 
     setActiveStep(activeStep + 1);
+  };
+
+  const confirmPayment = async () => {
+    setSubmitting(true);
+    try {
+      if (!confirmationToken || !basket?.clientSecret)
+        throw new Error("Unable to confirm payment");
+
+      const paymentResult = await stripe?.confirmPayment({
+        clientSecret: basket.clientSecret,
+        redirect: "if_required",
+        confirmParams: {
+          confirmation_token: confirmationToken.id,
+        },
+      });
+
+      if (paymentResult?.paymentIntent?.status === "succeeded") {
+        await clearBasket();
+        navigate("/checkout/success");
+      } else if (paymentResult?.error) {
+        throw new Error(paymentResult.error.message);
+      } else {
+        throw new Error("Something went wrong ");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const getStripeAddress = async () => {
@@ -136,19 +170,29 @@ export default function CheckoutStepper() {
         </Box>
       </Box>
 
-      <Box display="flex" paddingTop={2} justifyContent="space -between">
-        <Button onClick={handleback}>Back</Button>
-        <Button
-          onClick={handlenext}
-          disabled={
-            (activeStep === 0 && !addressCompleted) ||
-            (activeStep === 1 && !paymentCompleted)
-          }
-        >
-          {activeStep === steps.length - 1
-            ? `Pay ${currencyFormat(total)}`
-            : "Next"}
+      <Box display="flex" paddingTop={2} justifyContent="space-between">
+        <Button onClick={handleback} disabled={submitting}>
+          Back
         </Button>
+        {activeStep === steps.length - 1 ? (
+          <LoadingButton
+            loading={submitting}
+            onClick={confirmPayment}
+            variant="contained"
+          >
+            Pay {currencyFormat(total)}
+          </LoadingButton>
+        ) : (
+          <Button
+            onClick={handlenext}
+            disabled={
+              (activeStep === 0 && !addressCompleted) ||
+              (activeStep === 1 && !paymentCompleted)
+            }
+          >
+            Next
+          </Button>
+        )}
       </Box>
     </Paper>
   );
