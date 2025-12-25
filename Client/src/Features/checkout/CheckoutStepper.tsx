@@ -9,7 +9,6 @@ import {
   Stepper,
   Typography,
 } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
 import {
   AddressElement,
   PaymentElement,
@@ -31,13 +30,15 @@ import type {
 import { useBasketinfo } from "../../lib/hooks/useBasket";
 import { currencyFormat } from "../../lib/util";
 import { toast } from "react-toastify";
+import { ca } from "zod/v4/locales";
 import { useNavigate } from "react-router";
+import { LoadingButton } from "@mui/lab";
 
 const steps = ["Address", "Payment", "Review"];
 
 export default function CheckoutStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
-  const { basket, total, clearBasket } = useBasketinfo();
+  const { basket } = useBasketinfo();
   const { data: { name, ...restAddress } = {} as Address, isLoading } =
     useFetchAddressQuery();
   const [updateUserAddress] = useUpdateUserAddressMutation();
@@ -47,6 +48,7 @@ export default function CheckoutStepper() {
   const [addressCompleted, setAddressCompleted] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const { total, clearBasket } = useBasketinfo();
   const navigate = useNavigate();
   const [confirmationToken, setConfirmationToken] =
     useState<ConfirmationToken | null>(null);
@@ -65,8 +67,10 @@ export default function CheckoutStepper() {
       if (stripeResult.error) return toast.error(stripeResult.error.message);
       setConfirmationToken(stripeResult.confirmationToken);
     }
-
-    setActiveStep(activeStep + 1);
+    if (activeStep === 2) {
+      await confirmPayment();
+    }
+    if (activeStep < 2) setActiveStep(activeStep + 1);
   };
 
   const confirmPayment = async () => {
@@ -84,8 +88,8 @@ export default function CheckoutStepper() {
       });
 
       if (paymentResult?.paymentIntent?.status === "succeeded") {
-        await clearBasket();
         navigate("/checkout/success");
+        clearBasket();
       } else if (paymentResult?.error) {
         throw new Error(paymentResult.error.message);
       } else {
@@ -95,6 +99,7 @@ export default function CheckoutStepper() {
       if (error instanceof Error) {
         toast.error(error.message);
       }
+      setActiveStep((step) => step - 1);
     } finally {
       setSubmitting(false);
     }
@@ -163,36 +168,33 @@ export default function CheckoutStepper() {
           />
         </Box>
         <Box sx={{ display: activeStep === 1 ? "block" : "none" }}>
-          <PaymentElement onChange={handlePaymentChange} />
+          <PaymentElement
+            onChange={handlePaymentChange}
+            options={{
+              wallets: { applePay: "never", googlePay: "never" },
+            }}
+          />
         </Box>
         <Box sx={{ display: activeStep === 2 ? "block" : "none" }}>
           <Review confirmationToken={confirmationToken} />
         </Box>
       </Box>
 
-      <Box display="flex" paddingTop={2} justifyContent="space-between">
-        <Button onClick={handleback} disabled={submitting}>
-          Back
-        </Button>
-        {activeStep === steps.length - 1 ? (
-          <LoadingButton
-            loading={submitting}
-            onClick={confirmPayment}
-            variant="contained"
-          >
-            Pay {currencyFormat(total)}
-          </LoadingButton>
-        ) : (
-          <Button
-            onClick={handlenext}
-            disabled={
-              (activeStep === 0 && !addressCompleted) ||
-              (activeStep === 1 && !paymentCompleted)
-            }
-          >
-            Next
-          </Button>
-        )}
+      <Box display="flex" paddingTop={2} justifyContent="space -between">
+        <Button onClick={handleback}>Back</Button>
+        <LoadingButton
+          onClick={handlenext}
+          disabled={
+            (activeStep === 0 && !addressCompleted) ||
+            (activeStep === 1 && !paymentCompleted) ||
+            submitting
+          }
+          loading={submitting}
+        >
+          {activeStep === steps.length - 1
+            ? `Pay ${currencyFormat(total)}`
+            : "Next"}
+        </LoadingButton>
       </Box>
     </Paper>
   );

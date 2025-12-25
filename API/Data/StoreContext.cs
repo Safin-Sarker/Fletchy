@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.Build.Framework;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using API.Entities.OrderAggregate1;
+using Newtonsoft.Json;
 
 namespace API.Data;
 
@@ -12,9 +14,11 @@ namespace API.Data;
 
 public class StoreContext(DbContextOptions options) : IdentityDbContext<User>(options)
 {
-  public DbSet<Product> Products { get; set; }
+  public required DbSet<Product> Products { get; set; }
 
-  public DbSet<Basket> Baskets { get; set; }
+  public required DbSet<Basket> Baskets { get; set; }
+
+  public required DbSet<Order> Orders { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
