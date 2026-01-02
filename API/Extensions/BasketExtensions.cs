@@ -35,7 +35,8 @@ public static class BasketExtensions
         return await query
             .Include(x => x.Items)
             .ThenInclude(i => i.Product)
-            .FirstOrDefaultAsync(x => x.BasketId == basketId);
+            .FirstOrDefaultAsync(x => x.BasketId == basketId)
+             ?? throw new Exception("Basket not found");
   }
 
 
