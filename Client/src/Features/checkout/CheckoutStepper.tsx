@@ -33,11 +33,13 @@ import { toast } from "react-toastify";
 import { ca } from "zod/v4/locales";
 import { useNavigate } from "react-router";
 import { LoadingButton } from "@mui/lab";
+import { useCreateOrderMutation } from "../orders/orderApi";
 
 const steps = ["Address", "Payment", "Review"];
 
 export default function CheckoutStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
+  const [createOrder] = useCreateOrderMutation();
   const { basket } = useBasketinfo();
   const { data: { name, ...restAddress } = {} as Address, isLoading } =
     useFetchAddressQuery();
@@ -79,6 +81,10 @@ export default function CheckoutStepper() {
       if (!confirmationToken || !basket?.clientSecret)
         throw new Error("Unable to confirm payment");
 
+      const orderModel = await createOrderModel();
+
+      const orderResult = await createOrder(orderModel);
+
       const paymentResult = await stripe?.confirmPayment({
         clientSecret: basket.clientSecret,
         redirect: "if_required",
@@ -88,7 +94,7 @@ export default function CheckoutStepper() {
       });
 
       if (paymentResult?.paymentIntent?.status === "succeeded") {
-        navigate("/checkout/success");
+        navigate("/checkout/success", { state: orderResult });
         clearBasket();
       } else if (paymentResult?.error) {
         throw new Error(paymentResult.error.message);
@@ -103,6 +109,22 @@ export default function CheckoutStepper() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const createOrderModel = async () => {
+    const shippingAddress = await getStripeAddress();
+    const card = confirmationToken?.payment_method_preview.card;
+
+    if (!shippingAddress || !card) throw new Error("Unable to create order");
+
+    const paymentSummary = {
+      last4Digits: card.last4,
+      brand: card.brand,
+      exp_month: card.exp_month,
+      exp_year: card.exp_year,
+    };
+
+    return { shippingAddress, paymentSummary };
   };
 
   const getStripeAddress = async () => {
