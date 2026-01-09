@@ -14,6 +14,7 @@ import LoginForm from "../../Features/account/LoginForm";
 import RegisterForm from "../../Features/account/RegisterForm";
 import RequireAuth from "./RequireAuth";
 import OrderPage from "../../Features/orders/OrderPage";
+import OrderDetailedPage from "../../Features/orders/OrderDetailedPage";
 
 export const routes = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ export const routes = createBrowserRouter([
           { path: "checkout", element: <CheckoutPage /> },
           { path: "checkout/success", element: <CheckoutSuccess /> },
           { path: "orders", element: <OrderPage /> },
+          { path: "orders/:id", element: <OrderDetailedPage /> },
         ],
       },
       { path: "", element: <HomePage /> },

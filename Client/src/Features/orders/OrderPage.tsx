@@ -11,11 +11,14 @@ import {
 import { useFetchOrdersQuery } from "./orderApi";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import { currencyFormat } from "../../lib/util";
 
 export default function OrderPage() {
-  const { data: orders } = useFetchOrdersQuery();
+  const { data: orders, isLoading } = useFetchOrdersQuery();
 
   const navigate = useNavigate();
+
+  if (isLoading) return <Typography variant="h5">Loading orders...</Typography>;
 
   if (!orders) return <Typography variant="h5">No orders available</Typography>;
 
@@ -44,7 +47,8 @@ export default function OrderPage() {
                 <TableCell>
                   {new Date(order.orderDate).toLocaleDateString()}
                 </TableCell>
-                <TableCell>${(order.total / 100).toFixed(2)}</TableCell>
+                <TableCell>{format(order.orderDate, "dd MMM yyyy")}</TableCell>
+                <TableCell>{currencyFormat(order.total)}</TableCell>
                 <TableCell>{order.orderStatus}</TableCell>
               </TableRow>
             ))}
